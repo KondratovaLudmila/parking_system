@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "parking-system"
+version = "0.1.0"
+description = "simple crm for automatic parking"
+authors = ["Project group 5"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.0.6"
+psycopg2 = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
