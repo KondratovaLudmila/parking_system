@@ -5,6 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from .models import Car, Park
+import csv
 
 from .models import Car
 
@@ -28,6 +32,22 @@ class CarCreateView(CreateView):
     model = Car
     fields = ['reg_mark', 'model', 'color', 'fare', 'user']
     success_url = reverse_lazy("parking:cars")
+
+
+def generate_parking_report(request):
+    cars = Car.objects.all()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="parking_report.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['Registration Mark', 'Total Duration (seconds)', 'Total Cost'])
+
+    for car in cars:
+        total_duration = car.total_parking_duration()
+        total_cost = car.total_parking_cost()
+        writer.writerow([car.reg_mark, total_duration, total_cost])
+
+    return response
 
 
 
