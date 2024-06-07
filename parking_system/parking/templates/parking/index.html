@@ -1,0 +1,48 @@
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="d-flex justify-content-center">
+        <div class="col-12">
+            <div class="container text-center">
+                <h2>Cars List</h2>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'parking:car_add' %}" class="btn btn-primary align-self-end mb-3" role="button">Add Car</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                <thead>
+                    <tr>
+                    <th class="col-1" scope="col">#</th>
+                    <th class="col-3" scope="col">Registration mark</th>
+                    <th class="col-3" scope="col">Model</th>
+                    <th class="col-3" scope="col">Color</th>
+                    {% if user.is_superuser %}
+                    <th class="col-1" scope="col">Fare</th>
+                    <th class="col-1" scope="col">Action</th>
+                    {% else %}
+                    <th class="col-2" scope="col">Fare</th>
+                    {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for car in cars %}
+                    <tr>
+                    <td>{{ car.id }}</td>
+                    <td>{{ car.reg_mark }}</td>
+                    <td>{{ car.model }}</td>
+                    <td>{{ car.color }}</td>
+                    <td>{{ car.fare }}</td>
+                    {% if user.is_superuser %}
+                    <th class="col-1" scope="col"><a href="#" class="btn btn-outline-primary" >Delete</a></th>
+                    {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
