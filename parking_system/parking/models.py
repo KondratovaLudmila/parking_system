@@ -9,6 +9,7 @@ class Car(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     fare = models.FloatField(default=0)
+    confirmed = models.BooleanField(default=False)
     
     def __str__(self):
         return f"{self.reg_mark}"
@@ -41,6 +42,7 @@ class Park(models.Model):
             duration_hours = (self.out_time - self.in_time).total_seconds() / 3600
             self.cost = duration_hours * self.car.fare
             self.save()
+
 
 class Ban(models.Model):
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
