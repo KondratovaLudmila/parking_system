@@ -8,6 +8,7 @@ class Car(models.Model):
     color = models.CharField(max_length=30, null=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+    fare = models.FloatField(default=0)
     
     def __str__(self):
         return f"{self.reg_mark}"

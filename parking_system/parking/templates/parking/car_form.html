@@ -1,0 +1,34 @@
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="d-flex justify-content-center">
+    <div class="col-5">
+        <div class="mb-3">
+            <h2>Carr Add Form</h2>
+        </div>
+        <form method="POST" action="{% url 'parking:car_add' %}">
+            {% csrf_token %}
+            <label for="inputRegmark" class="form-label">Registration mark</label>
+            <input type="text" id="inputRegmark" name="reg_mark" class="form-control mb-3"/>
+            <span class="text-danger">{{ form.errors.reg_mark }}</span>
+            <label for="inputModel" class="form-label">Model</label>
+            <input type="text" id="inputModel" name="model" class="form-control mb-3"/>
+            <span class="text-danger">{{ form.errors.model }}</span>
+            <label for="inputColor" class="form-label">Color</label>
+            <input type="text" id="inputColor" name="color" class="form-control mb-3"/>
+            <span class="text-danger">{{ form.errors.color }}</span>
+            {% if user.is_superuser %}
+            <label for="InputFare" class="form-label">Fare</label>
+            <input type="number" class="form-control mb-3" id="InputFare" name="fare"/>
+            <span class="text-danger">{{ form.errors.fare }}</span>
+            {% else %}
+            <input type="hidden" class="form-control mb-3" id="InputFare" name="fare" value="0.5"/>
+            {% endif %}
+            <input type="hidden"  id="InputFare" name="user" value="{{ user.id }}"/>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
