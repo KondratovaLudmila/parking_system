@@ -17,15 +17,27 @@
                         <span class="fs-4">Smart Parking Manager</span>
                     </a>
                 </div>
-                <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="{% url 'parking:cars' %}" class="nav-link {% if request.resolver_match.url_name == 'cars' %}active{% endif %}" aria-current="page">Cars</a></li>
-                    <li class="nav-item"><a href="{% url 'parking:parking_report' %}" class="nav-link {% if request.resolver_match.url_name == 'parking_report' %}active{% endif %}">Parking Report</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">History</a></li>
-                    <li class="nav-item"><a href="#" class="nav-link">Profile</a></li>
+                <ul class="nav nav-underline">
+                    <li class="nav-item"><a href="{% url 'parking:cars' %}" {% if request.resolver_match.url_name == "cars" %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page">Cars</a></li>
+                    {% if user.is_superuser %}
+                    <li class="nav-item"><a href="{% url 'parking:parking_info' %}" {% if request.resolver_match.url_name == "settings" %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page">Parking info</a></li>
+                    {% else %}
+                    <li class="nav-item"><a href="{% url 'parking:history' %}" {% if request.resolver_match.url_name == "history" %} class="nav-link active" {% else %} class="nav-link" {% endif %}>History</a></li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">Reports</a>
+                        <ul class="dropdown-menu" aria-labelledby="dropdown">
+                          <li><a class="dropdown-item" href="{% url 'parking:parking_report' %}" class="" >Parking report</a></li>
+                          <li><a class="dropdown-item" href="#">Peyment report</a></li>
+                        </ul>
+                      </li>
+                    <li class="nav-item"><a href="{% url 'users:profile' %}" {% if request.resolver_match.url_name == "profile" %} class="nav-link active" {% else %} class="nav-link" {% endif %}>Profile</a></li>
                 </ul>
                 <div class="col-md-3 text-end">
                     <form method="POST" action="{% url 'users:signout' %}">
                         {% csrf_token %}
+                        <span>Hi, <b>{{ user.username }}! </b></span>
+                        <a href="{% url 'parking:parking' %}" class="btn btn-primary" role="button">Parking</a>
                         <button type="submit" class="btn btn-outline-primary me-2">Sign-out</button>
                     </form>
                 </div>

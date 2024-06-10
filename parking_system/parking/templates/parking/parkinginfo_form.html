@@ -1,0 +1,33 @@
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="d-flex justify-content-center">
+    <div class="col-5">
+        <div class="mb-3">
+            <h2 class="display-6 fw-normal text-body-emphasis">Settings</h2>
+        </div>
+        <form method="POST">
+            {% csrf_token %}
+            <label for="inputAddress" class="form-label">Address</label>
+            {% if form.address.value is not None %}
+            <input type="text" id="inputAddress" name="address" class="form-control mb-3" value="{{ form.address.value }}"/>
+            {% else %}
+            <input type="text" id="inputAddress" name="address" class="form-control mb-3"/>
+            {% endif %}
+            <span class="text-danger">{{ form.errors.address }}</span>
+            <label for="inputPlaces" class="form-label">Places</label>
+            <input type="number" id="inputModel" name="places" class="form-control mb-3" value="{{ form.places.value }}"/>
+            <span class="text-danger">{{ form.errors.places }}</span>
+            <label for="inputLimit" class="form-label">Default limit</label>
+            <input type="text" id="inputLimit" name="limit" class="form-control mb-3" value="{{ form.limit.value }}"/>
+            <span class="text-danger">{{ form.errors.limit }}</span>
+            <label for="inputFare" class="form-label">Default fare</label>
+            <input type="text" id="inputFare" name="default_fare" class="form-control mb-3" value="{{ form.default_fare.value }}"/>
+            <span class="text-danger">{{ form.errors.default_fare }}</span>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}
