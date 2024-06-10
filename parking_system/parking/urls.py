@@ -6,6 +6,6 @@ app_name = 'parking'
 urlpatterns = [
     path('', views.CarsView.as_view(), name='cars'),
     path('car/', views.CarCreateView.as_view(), name='car_add'),
-    path('generate_parking_report/', views.generate_parking_report, name='generate_parking_report'),
+    path('parking_report/', views.parking_report, name='parking_report'),
 
 ]

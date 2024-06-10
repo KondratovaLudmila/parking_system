@@ -34,7 +34,7 @@ class CarCreateView(CreateView):
     success_url = reverse_lazy("parking:cars")
 
 
-def generate_parking_report(request):
+def parking_report(request):
     cars = Car.objects.all()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="parking_report.csv"'
