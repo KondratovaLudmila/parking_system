@@ -18,7 +18,8 @@
                     </a>
                 </div>
                 <ul class="nav nav-pills">
-                    <li class="nav-item"><a href="{% url 'parking:cars' %}" class="nav-link active" aria-current="page">Cars</a></li>
+                    <li class="nav-item"><a href="{% url 'parking:cars' %}" class="nav-link {% if request.resolver_match.url_name == 'cars' %}active{% endif %}" aria-current="page">Cars</a></li>
+                    <li class="nav-item"><a href="{% url 'parking:parking_report' %}" class="nav-link {% if request.resolver_match.url_name == 'parking_report' %}active{% endif %}">Parking Report</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">History</a></li>
                     <li class="nav-item"><a href="#" class="nav-link">Profile</a></li>
                 </ul>

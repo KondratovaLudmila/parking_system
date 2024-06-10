@@ -1,1 +1,46 @@
-<a href="{% url 'parking_report' %}">Download Parking Report</a>
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="d-flex justify-content-center">
+        <div class="col-12">
+            <div class="container text-center">
+                <h2>Parking Report</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th class="col-1" scope="col">#</th>
+                            <th class="col-3" scope="col">Registration Mark</th>
+                            <th class="col-3" scope="col">Total Duration (seconds)</th>
+                            <th class="col-3" scope="col">Total Cost</th>
+                            {% if user.is_superuser %}
+                            <th class="col-3" scope="col">User</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in reports %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.registration_mark }}</td>
+                            <td>{{ item.total_duration }}</td>
+                            <td>{{ item.total_cost }}</td>
+                            {% if user.is_superuser %}
+                            <td>{{ item.user.username }}</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if user.is_superuser %}
+            <div class="text-center mt-4">
+                <a href="{% url 'parking:download_reports' %}" class="btn btn-primary">Download All Reports</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
