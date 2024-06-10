@@ -13,15 +13,27 @@ then
     echo "PostgreSQL started"
 fi
 
-if [ $? -ne 0 ]; then
-    echo "Database connection failed"
-    exit 1
-else
-    echo "Database connection successful"
-fi
-
-# Run database migrations
+# Apply database migrations
 python manage.py migrate
+
+# Create initial superuser
+python manage.py shell <<EOF
+import os
+import django
+from django.contrib.auth.models import User
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'parking_system.settings')
+django.setup()
+
+if not User.objects.filter(username='admin').exists():
+    User.objects.create_superuser(
+        username='admin',
+        email='admin@example.com',
+        password='password',
+        first_name='Admin',
+        last_name='User'
+    )
+EOF
 
 # Execute the command passed as arguments to the script
 exec "$@"
