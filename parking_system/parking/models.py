@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -37,13 +38,34 @@ class Park(models.Model):
     out_time = models.DateTimeField(null=True, blank=True)
     cost = models.FloatField(default=0)
 
+
     def calculate_cost(self):
         if self.out_time:
             duration_hours = (self.out_time - self.in_time).total_seconds() / 3600
+            # Per hour tarification
+            if int(duration_hours) != duration_hours:
+                duration_hours = int(duration_hours) + 1
             self.cost = duration_hours * self.car.fare
-            self.save()
+
+    # Cost calculation when saving the model
+    def save(self, *args, **kwargs):
+        self.calculate_cost()
+        return super().save(*args, **kwargs)
 
 
 class Ban(models.Model):
     car = models.ForeignKey(Car, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
+
+
+class Payment(models.Model):
+    amount = models.FloatField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+
+class ParkingInfo(models.Model):
+    address = models.CharField(max_length=40, null=True)
+    places = models.IntegerField(default=0)
+    limit = models.FloatField(default=0)
+    default_fare = models.FloatField(default=0)

@@ -1,0 +1,26 @@
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="d-flex justify-content-center">
+    <div class="col-5">
+        <div class="mb-3">
+            <h2 class="display-6 fw-normal text-body-emphasis">Parking</h2>
+        </div>
+        {% if message %}
+        <div>
+            <div class="alert alert-danger" role="alert">{{ message }}</div>
+        </div>
+        {% endif %}
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="formFile" class="form-label">Car plate image</label>
+                <input class="form-control" type="file" id="formFile" name="photo" accept=".jpg, .jpeg" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock %}

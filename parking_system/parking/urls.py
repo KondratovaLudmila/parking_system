@@ -6,6 +6,11 @@ app_name = 'parking'
 urlpatterns = [
     path('', views.CarsView.as_view(), name='cars'),
     path('car/', views.CarCreateView.as_view(), name='car_add'),
-    path('generate_parking_report/', views.generate_parking_report, name='generate_parking_report'),
-
+    path('history/', views.HistoryView.as_view(), name='history'),
+    path('parking/', views.parking, name='parking'),
+    path('parking_info/', views.SettingsView.as_view(), name='parking_info'),
+    path('parking/in/', views.ParkingInView.as_view(), name='parking_in'),
+    path('parking/out/', views.ParkingOutView.as_view(), name='parking_out'),
+    path('parking_report/', views.parking_report, name='parking_report'),
+    path('download_reports/', views.download_reports, name='download_reports'),
 ]

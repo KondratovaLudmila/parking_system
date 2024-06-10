@@ -14,7 +14,7 @@
                 <div class="d-flex justify-content-center">
                 <div class="col-5">
                     <div class="mb-3">
-                        <h2>User sign-up form</h2>
+                        <h2 class="display-6 fw-normal text-body-emphasis">User sign-up form</h2>
                     </div>
                     <form method="POST" action="{% url 'users:signup' %}">
                         {% csrf_token %}
@@ -24,7 +24,7 @@
                         <label for="inputFirstname" class="form-label">First name</label>
                         <input type="text" id="inputFirstname" name="first_name" class="form-control mb-3"/>
                         <span class="text-danger">{{ form.errors.first_name }}</span>
-                        <label for="inputLastname" class="form-label">Last Name</label>
+                        <label for="inputLastname" class="form-label">Last name</label>
                         <input type="text" id="inputLastname" name="last_name" class="form-control mb-3"/>
                         <span class="text-danger">{{ form.errors.last_name }}</span>
                         <label for="InputEmail" class="form-label">Email address</label>

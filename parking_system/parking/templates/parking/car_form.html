@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-center">
     <div class="col-5">
         <div class="mb-3">
-            <h2>Carr Add Form</h2>
+            <h2 class="display-6 fw-normal text-body-emphasis">Carr Add Form</h2>
         </div>
         <form method="POST" action="{% url 'parking:car_add' %}">
             {% csrf_token %}
@@ -20,12 +20,12 @@
             <span class="text-danger">{{ form.errors.color }}</span>
             {% if user.is_superuser %}
             <label for="InputFare" class="form-label">Fare</label>
-            <input type="number" class="form-control mb-3" id="InputFare" name="fare"/>
+            <input type="text" class="form-control mb-3" id="InputFare" name="fare"/>
             <span class="text-danger">{{ form.errors.fare }}</span>
             {% else %}
             <input type="hidden" class="form-control mb-3" id="InputFare" name="fare" value="0.5"/>
             {% endif %}
-            <input type="hidden"  id="InputFare" name="user" value="{{ user.id }}"/>
+            <input type="hidden"  id="Inputuser" name="user" value="{{ user.id }}"/>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
