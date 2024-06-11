@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     libssl-dev \
-    libffi-dev
+    libffi-dev \
+    netcat-openbsd
 
 # Set the working directory in the container
 WORKDIR /app
@@ -18,8 +19,16 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+# Ensure the static and media directories exist
+RUN mkdir -p /app/static
+RUN mkdir -p /app/staticfiles
+RUN mkdir -p /app/media
+
 # Copy the entire project into the container
 COPY . .
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
 
 # Copy the entrypoint script into the container and make it executable
 COPY ./entrypoint.sh /entrypoint.sh

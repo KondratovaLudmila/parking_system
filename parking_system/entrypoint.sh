@@ -13,14 +13,10 @@ then
     echo "PostgreSQL started"
 fi
 
-if [ $? -ne 0 ]; then
-    echo "Database connection failed"
-    exit 1
-else
-    echo "Database connection successful"
-fi
+# Collect static files
+python manage.py collectstatic --noinput
 
-# Run database migrations
+# Apply database migrations
 python manage.py migrate
 
 # Execute the command passed as arguments to the script
