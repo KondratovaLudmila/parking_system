@@ -37,7 +37,14 @@ class CarCreateView(CreateView):
     fields = ['reg_mark', 'model', 'color', 'fare', 'user']
     success_url = reverse_lazy("parking:cars")
 
+@login_required
+def parking_report(request):
+    if request.user.is_superuser:
+        cars = Car.objects.all()
+    else:
+        cars = Car.objects.filter(user=request.user)
 
+        
 @method_decorator(login_required, name='dispatch')
 class HistoryView(TemplateView):
     template_name = "parking/history.html"
@@ -156,7 +163,3 @@ def download_reports(request):
         writer.writerow([car.reg_mark, total_duration, total_cost, car.user.username])
 
     return response
-
-
-
-
