@@ -1,33 +1,35 @@
 from typing import Any
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404, redirect
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_protect
 from datetime import datetime, timezone
-
-from .models import Car, Park, ParkingInfo
+from .models import Car, Park, ParkingInfo, Ban
 from .decorators import superuser_required
 import csv
+from .forms import CarForm
 
-from .models import Car
 
 @method_decorator(login_required, name='dispatch')
 class CarsView(TemplateView):
     template_name = 'parking/index.html'
 
-
     def get_context_data(self, **kwargs) -> dict[str]:
         context = super().get_context_data(**kwargs)
-        
         if self.request.user.is_superuser:
-            context['cars'] = Car.objects.all()
+            cars = Car.objects.all()
         else:
-            context['cars'] = Car.objects.filter(user=self.request.user)
+            cars = Car.objects.filter(user=self.request.user)
+        for car in cars:
+            car.is_banned = Ban.objects.filter(car=car).exists()
+
+        context['cars'] = cars
         return context
     
 
@@ -36,6 +38,7 @@ class CarCreateView(CreateView):
     model = Car
     fields = ['reg_mark', 'model', 'color', 'fare', 'user']
     success_url = reverse_lazy("parking:cars")
+
 
 @login_required
 def parking_report(request):
@@ -145,8 +148,10 @@ def parking_report(request):
 
     return render(request, 'parking/report.html', {'reports': reports})
 
+
 def is_admin(user):
     return user.is_superuser
+
 
 @user_passes_test(is_admin)
 def download_reports(request):
@@ -163,3 +168,45 @@ def download_reports(request):
         writer.writerow([car.reg_mark, total_duration, total_cost, car.user.username])
 
     return response
+
+
+@csrf_protect
+def delete_car(request, id):
+    if request.method == 'POST':
+        item = get_object_or_404(Car, id=id)
+        item.delete()
+        return redirect('parking:cars')
+    return HttpResponse(status=405)
+
+
+def edit_car(request, id):
+    item = get_object_or_404(Car, id=id)
+    if request.method == 'POST':
+        form = CarForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect('parking:cars')
+    else:
+        form = CarForm(instance=item)
+    return render(request, 'parking/edit_car.html', {'form': form, 'car': item})
+
+
+@login_required
+@csrf_protect
+def ban_car(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+    if request.method == 'POST':
+        Ban.objects.create(car=car)
+        return redirect('parking:cars')
+    return HttpResponse(status=405)
+
+
+@login_required
+@csrf_protect
+def unban_car(request, car_id):
+    car = get_object_or_404(Car, id=car_id)
+    if request.method == 'POST':
+        ban = get_object_or_404(Ban, car=car)
+        ban.delete()
+        return redirect('parking:cars')
+    return HttpResponse(status=405)

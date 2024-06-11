@@ -1,0 +1,54 @@
+{% extends "parking/base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-center">
+    <div class="col-5">
+        <div class="mb-3">
+            <h2>Edit info</h2>
+        </div>
+        <form method="POST" action="{% url 'parking:edit_car' id=car.id %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="inputRegmark" class="form-label">Registration mark</label>
+                <input type="text" id="inputRegmark" name="reg_mark" value="{{ form.reg_mark.value }}" class="form-control {% if form.reg_mark.errors %}is-invalid{% endif %}">
+                {% if form.reg_mark.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.reg_mark.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="inputModel" class="form-label">Model</label>
+                <input type="text" id="inputModel" name="model" value="{{ form.model.value }}" class="form-control {% if form.model.errors %}is-invalid{% endif %}">
+                {% if form.model.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.model.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="inputColor" class="form-label">Color</label>
+                <input type="text" id="inputColor" name="color" value="{{ form.color.value }}" class="form-control {% if form.color.errors %}is-invalid{% endif %}">
+                {% if form.color.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.color.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <label for="inputFare" class="form-label">Fare</label>
+                <input type="number" id="inputFare" name="fare" value="{{ form.fare.value }}" class="form-control {% if form.fare.errors %}is-invalid{% endif %}">
+                {% if form.fare.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.fare.errors }}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="mb-3">
+                <input type="checkbox" class="form-check-input {% if form.confirmed.errors %}is-invalid{% endif %}" id="inputConfirmed" name="confirmed" {% if form.confirmed.value %}checked{% endif %}>
+                 <label for="inputConfirmed" class="form-check-label">Confirmed</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+        </form>
+    </div>
+{% endblock %}

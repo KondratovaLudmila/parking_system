@@ -22,6 +22,10 @@
             <label for="InputFare" class="form-label">Fare</label>
             <input type="text" class="form-control mb-3" id="InputFare" name="fare"/>
             <span class="text-danger">{{ form.errors.fare }}</span>
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="inputConfirmed" name="confirmed">
+                <label for="inputConfirmed" class="form-check-label">Confirmed</label>
+            </div>
             {% else %}
             <input type="hidden" class="form-control mb-3" id="InputFare" name="fare" value="0.5"/>
             {% endif %}
