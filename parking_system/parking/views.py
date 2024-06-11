@@ -69,7 +69,7 @@ class SettingsView(UpdateView):
     fields = ['address', 'places', 'limit', 'default_fare']
     success_url = reverse_lazy('parking:parking_info')
 
-    def get_object(self, queryset: QuerySet[Any] | None = ...) -> Model:
+    def get_object(self, queryset=None) -> Model:
         first = ParkingInfo.objects.first()
         # We need to be shure that we hawe a record
         if first is None:
