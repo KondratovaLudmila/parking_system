@@ -1,0 +1,6 @@
+path: C:\Users\vlad\PycharmProjects\pythonProject2\parking_system\numberplate_ukr\dataset\npdata
+train: images/train
+val: images/val
+test:  # optional
+nc: 1  # кількість класів
+names: ['numberplate']  # імена класів
