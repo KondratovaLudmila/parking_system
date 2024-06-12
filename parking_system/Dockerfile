@@ -19,16 +19,13 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+# Copy the entire project into the container
+COPY . .
+
 # Ensure the static and media directories exist
 RUN mkdir -p /app/static
 RUN mkdir -p /app/staticfiles
 RUN mkdir -p /app/media
-
-# Copy the entire project into the container
-COPY . .
-
-# Collect static files
-RUN python manage.py collectstatic --noinput
 
 # Copy the entrypoint script into the container and make it executable
 COPY ./entrypoint.sh /entrypoint.sh
