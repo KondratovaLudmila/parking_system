@@ -14,6 +14,7 @@ from .models import Car, Park, ParkingInfo, Ban
 from .decorators import superuser_required
 import csv
 from .forms import CarForm
+from django.db.models import OuterRef, Subquery, Exists
 
 
 @method_decorator(login_required, name='dispatch')
@@ -26,8 +27,9 @@ class CarsView(TemplateView):
             cars = Car.objects.all()
         else:
             cars = Car.objects.filter(user=self.request.user)
-        for car in cars:
-            car.is_banned = Ban.objects.filter(car=car).exists()
+
+        banned_subquery = Ban.objects.filter(car=OuterRef('pk'))
+        cars = cars.annotate(is_banned=Exists(banned_subquery))
 
         context['cars'] = cars
         return context
@@ -36,7 +38,7 @@ class CarsView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class CarCreateView(CreateView):
     model = Car
-    fields = ['reg_mark', 'model', 'color', 'fare', 'user']
+    fields = ['reg_mark', 'model', 'color', 'fare', 'user', "confirmed"]
     success_url = reverse_lazy("parking:cars")
 
 
@@ -183,12 +185,13 @@ def edit_car(request, id):
     item = get_object_or_404(Car, id=id)
     if request.method == 'POST':
         form = CarForm(request.POST, instance=item)
+        print(form.errors)
         if form.is_valid():
             form.save()
             return redirect('parking:cars')
     else:
         form = CarForm(instance=item)
-    return render(request, 'parking/edit_car.html', {'form': form, 'car': item})
+    return render(request, 'parking/edit_car.html', {'form': form, "car": item})
 
 
 @login_required
@@ -210,3 +213,21 @@ def unban_car(request, car_id):
         ban.delete()
         return redirect('parking:cars')
     return HttpResponse(status=405)
+
+
+@login_required
+@csrf_protect
+def search_cars(request):
+    if request.method == 'POST':
+        query = request.POST.get('q', '')
+        if request.user.is_superuser:
+            user_cars = Car.objects.all()
+        else:
+            user_cars = Car.objects.filter(user=request.user)
+
+        if query:
+            user_cars = user_cars.filter(
+                color__icontains=query) | user_cars.filter(
+                model__icontains=query) | user_cars.filter(
+                reg_mark__icontains=query)
+        return render(request, 'parking/car_list.html', {'cars': user_cars, "search_text": query})

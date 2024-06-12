@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-center">
     <div class="col-5">
         <div class="mb-3">
-            <h2 class="display-6 fw-normal text-body-emphasis">Carr Add Form</h2>
+            <h2 class="display-6 fw-normal text-body-emphasis">Car Add Form</h2>
         </div>
         <form method="POST" action="{% url 'parking:car_add' %}">
             {% csrf_token %}
@@ -20,11 +20,25 @@
             <span class="text-danger">{{ form.errors.color }}</span>
             {% if user.is_superuser %}
             <label for="InputFare" class="form-label">Fare</label>
-            <input type="text" class="form-control mb-3" id="InputFare" name="fare"/>
+            <input type="number" class="form-control mb-3" id="InputFare" name="fare"/>
             <span class="text-danger">{{ form.errors.fare }}</span>
-            <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="inputConfirmed" name="confirmed">
-                <label for="inputConfirmed" class="form-check-label">Confirmed</label>
+            <div class="mb-3">
+                <input type="checkbox" class="form-check-input {% if form.confirmed.errors %}is-invalid{% endif %}" id="inputConfirmed" name="confirmed" {% if form.confirmed.value %}checked{% endif %}>
+                 <label for="inputConfirmed" class="form-check-label">Confirmed</label>
+            </div>
+            <div class="mb-3">
+                <label for="inputUser" class="form-label">Owner</label>
+                <select id="inputUser" name="user" class="form-select {% if form.user.errors %}is-invalid{% endif %}" required>
+                    <option value="">Select owner</option>
+                    {% for user in form.user.field.queryset %}
+                        <option value="{{ user.id }}" {% if user.id == form.user.value %}selected{% endif %}>{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.user.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.user.errors }}
+                    </div>
+                {% endif %}
             </div>
             {% else %}
             <input type="hidden" class="form-control mb-3" id="InputFare" name="fare" value="0.5"/>

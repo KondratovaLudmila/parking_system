@@ -44,9 +44,24 @@
                     </div>
                 {% endif %}
             </div>
+
             <div class="mb-3">
                 <input type="checkbox" class="form-check-input {% if form.confirmed.errors %}is-invalid{% endif %}" id="inputConfirmed" name="confirmed" {% if form.confirmed.value %}checked{% endif %}>
-                 <label for="inputConfirmed" class="form-check-label">Confirmed</label>
+                <label for="inputConfirmed" class="form-check-label">Confirmed</label>
+            </div>
+            <div class="mb-3">
+                <label for="inputUser" class="form-label">Owner</label>
+                <select id="inputUser" name="user" class="form-select {% if form.user.errors %}is-invalid{% endif %}" required>
+                    <option value="">Select owner</option>
+                    {% for user in form.user.field.queryset %}
+                        <option value="{{ user.id }}" {% if user.id == form.user.value %}selected{% endif %}>{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+                {% if form.user.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.user.errors }}
+                    </div>
+                {% endif %}
             </div>
             <button type="submit" class="btn btn-primary">Save changes</button>
         </form>

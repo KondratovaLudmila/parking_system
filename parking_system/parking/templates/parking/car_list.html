@@ -1,18 +1,20 @@
+
+
+
 {% extends "parking/base.html" %}
 
 {% block content %}
 <div class="row">
     <div class="d-flex justify-content-center">
         <div class="col-12">
-            <div class="container text-center">
-                <h2 class="display-6 fw-normal text-body-emphasis mb-3">Car List</h2>
-            </div>
-            <div class="d-flex justify-content-end align-items-center gap-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="left-align">
+                    <h3 class="mt-1">Results for <b>"{{search_text}}"</b></h3>
+                </div>
                 <form class="form-inline" action="{% url 'parking:search_cars' %}" method="POST">
                     {% csrf_token %}
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q" required>
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ query }}">
                 </form>
-                <a href="{% url 'parking:car_add' %}" class="btn btn-primary mb-3 mt-3" role="button">Add Car</a>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover">
@@ -42,7 +44,6 @@
                     </td>
                     <td>{{ car.fare }}</td>
                     {% if user.is_superuser %}
-                    <td>{{ car.user }}</td>
                     <td>
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-bs-toggle="dropdown" aria-expanded="false">
