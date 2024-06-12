@@ -4,15 +4,10 @@
 <div class="row">
     <div class="d-flex justify-content-center">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="left-align">
-                    <h3 class="mt-1">Results for <b>"{{search_text}}"</b></h3>
-                </div>
-                <form class="form-inline" action="{% url 'parking:search_cars' %}" method="POST">
-                    {% csrf_token %}
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q" value="{{ query }}">
-                </form>
+            <div class="container text-center">
+                <h2 class="display-6 fw-normal text-body-emphasis mb-3">Banned cars</h2>
             </div>
+
             <div class="table-responsive">
                 <table class="table table-hover">
                 <thead>
@@ -21,25 +16,20 @@
                     <th class="col-3" scope="col">Registration mark</th>
                     <th class="col-3" scope="col">Model</th>
                     <th class="col-3" scope="col">Color</th>
-                    <th class="col-2" scope="col">Confirmed</th>
-                    <th class="col-1" scope="col">Fare</th>
-                    {% if user.is_superuser %}
                     <th class="col-2" scope="col">Owner</th>
-                    {% endif %}
+                    <th class="col-2" scope="col">Reason</th>
                     <th class="col-2" scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for car in cars %}
+                    {% for car in banned_cars %}
                     <tr>
                     <td>{{ car.id }}</td>
                     <td>{{ car.reg_mark }}</td>
                     <td>{{ car.model }}</td>
                     <td>{{ car.color }}</td>
-                    <td class="{% if car.confirmed %}text-success{% else %}text-danger{% endif %}">
-                        {{ car.confirmed }}
-                    </td>
-                    <td>{{ car.fare }}</td>
+                    <td>{{ car.user }}</td>
+                    <td></td>
                     {% if user.is_superuser %}
                     <td>
                         <div class="dropdown">

@@ -2,6 +2,7 @@ from typing import Any
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.shortcuts import redirect, render, get_object_or_404, redirect
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -28,18 +29,25 @@ class CarsView(TemplateView):
         else:
             cars = Car.objects.filter(user=self.request.user)
 
-        banned_subquery = Ban.objects.filter(car=OuterRef('pk'))
-        cars = cars.annotate(is_banned=Exists(banned_subquery))
-
         context['cars'] = cars
         return context
-    
+
+
 
 @method_decorator(login_required, name='dispatch')
 class CarCreateView(CreateView):
     model = Car
     fields = ['reg_mark', 'model', 'color', 'fare', 'user', "confirmed"]
     success_url = reverse_lazy("parking:cars")
+
+
+class CarsBanList(ListView):
+    model = Car
+    template_name = 'parking/ban_list.html'
+    context_object_name = 'banned_cars'
+
+    def get_queryset(self):
+        return Car.objects.filter(is_banned=True)
 
 
 @login_required
@@ -200,6 +208,8 @@ def ban_car(request, car_id):
     car = get_object_or_404(Car, id=car_id)
     if request.method == 'POST':
         Ban.objects.create(car=car)
+        car.is_banned = True
+        car.save()
         return redirect('parking:cars')
     return HttpResponse(status=405)
 
@@ -211,7 +221,9 @@ def unban_car(request, car_id):
     if request.method == 'POST':
         ban = get_object_or_404(Ban, car=car)
         ban.delete()
-        return redirect('parking:cars')
+        car.is_banned = False
+        car.save()
+    return redirect('parking:cars')
     return HttpResponse(status=405)
 
 
