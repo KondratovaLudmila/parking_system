@@ -96,25 +96,32 @@
                     <li class="nav-item"><a href="{% url 'parking:cars' %}" {% if request.resolver_match.url_name == "cars" %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page">Cars</a></li>
                     {% if user.is_superuser %}
                     <li class="nav-item"><a href="{% url 'parking:parking_info' %}" {% if request.resolver_match.url_name == "settings" %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page">Parking info</a></li>
-                    {% else %}
-                    <li class="nav-item"><a href="{% url 'parking:history' %}" {% if request.resolver_match.url_name == "history" %} class="nav-link active" {% else %} class="nav-link" {% endif %}>History</a></li>
-                    {% endif %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">Reports</a>
+                        <a class="nav-link dropdown-toggle" href="#" id="dropdown" data-bs-toggle="dropdown" aria-expanded="true" aria-current="page" style="padding: 0.5rem 0.375rem">Reports</a>
                         <ul class="dropdown-menu" aria-labelledby="dropdown">
                           <li><a class="dropdown-item" href="{% url 'parking:parking_report' %}" class="" >Parking report</a></li>
                           <li><a class="dropdown-item" href="#">Peyment report</a></li>
                         </ul>
-                      </li>
-                    <li class="nav-item"><a href="{% url 'users:profile' %}" {% if request.resolver_match.url_name == "profile" %} class="nav-link active" {% else %} class="nav-link" {% endif %}>Profile</a></li>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a href="{% url 'parking:history' %}" {% if request.resolver_match.url_name == "history" %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page">History</a></li>
+                    {% endif %}
+                    <li class="nav-item"><a href="{% url 'users:profile' %}" {% if request.resolver_match.url_name == "profile" %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page">Profile</a></li>
                 </ul>
                 <div class="col-md-3 text-end">
+                    {% if user.username %}
                     <form method="POST" action="{% url 'users:signout' %}">
                         {% csrf_token %}
                         <span>Hi, <b>{{ user.username }}! </b></span>
                         <a href="{% url 'parking:parking' %}" class="btn btn-primary" role="button">Parking</a>
                         <button type="submit" class="btn btn-outline-primary me-2">Sign-out</button>
                     </form>
+                    {% else %}
+                    <form method="POST" action="{% url 'users:signin' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-primary me-2">Sign-in</button>
+                    </form>
+                    {% endif %}
                 </div>
               </header>
             {% block content %}

@@ -14,30 +14,38 @@
                 <table class="table table-hover">
                 <thead>
                     <tr>
-                    <th class="col-1" scope="col">#</th>
-                    <th class="col-3" scope="col">Registration mark</th>
-                    <th class="col-3" scope="col">Model</th>
-                    <th class="col-3" scope="col">Color</th>
-                    <th class="col-2" scope="col">Confirmed</th>
+                    <th class="col-1" scope="col">ID</th>
+                    <th class="col-2" scope="col">Registration mark</th>
+                    <th class="col-2" scope="col">Model</th>
+                    <th class="col-2" scope="col">Color</th>
+                    <th class="col-1" scope="col">Confirmed</th>
                     {% if user.is_superuser %}
                     <th class="col-1" scope="col">Fare</th>
+                    <th class="col-2" scope="col">Owner</th>
+                    <th class="col-1" scope="col"></th>
                     {% else %}
                     <th class="col-2" scope="col">Fare</th>
                     {% endif %}
-                    <th class="col-2" scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for car in cars %}
+                    {% if car.confirmed %}
                     <tr>
+                    {% else %}
+                    <tr class="table-danger">
+                    {% endif %}
                     <td>{{ car.id }}</td>
                     <td>{{ car.reg_mark }}</td>
                     <td>{{ car.model }}</td>
                     <td>{{ car.color }}</td>
-                    <td class="{% if car.confirmed %}text-success{% else %}text-danger{% endif %}">
-                        {{ car.confirmed }}
+                    <td>
+                        <input class="form-check-input dark" type="checkbox" onclick="return false" {% if car.confirmed %} checked {% endif %}>
                     </td>
                     <td>{{ car.fare }}</td>
+                    {% if user.is_superuser %}
+                    <td>{{ car.user }}</td>
+                    {% endif %}
                     {% if user.is_superuser %}
                     <td>
                         <div class="dropdown">

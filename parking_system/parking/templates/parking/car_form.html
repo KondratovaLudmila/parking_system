@@ -20,14 +20,14 @@
             <span class="text-danger">{{ form.errors.color }}</span>
             {% if user.is_superuser %}
             <label for="InputFare" class="form-label">Fare</label>
-            <input type="text" class="form-control mb-3" id="InputFare" name="fare"/>
+            <input type="text" class="form-control mb-3" id="InputFare" name="fare" value="{{ parking_info.default_fare }}"/>
             <span class="text-danger">{{ form.errors.fare }}</span>
             <div class="form-check mb-3">
-                <input type="checkbox" class="form-check-input" id="inputConfirmed" name="confirmed">
+                <input type="checkbox" class="form-check-input" id="inputConfirmed" name="confirmed" checked>
                 <label for="inputConfirmed" class="form-check-label">Confirmed</label>
             </div>
             {% else %}
-            <input type="hidden" class="form-control mb-3" id="InputFare" name="fare" value="0.5"/>
+            <input type="hidden" class="form-control mb-3" id="InputFare" name="fare" value="{{ parking_info.default_fare }}"/>
             {% endif %}
             <input type="hidden"  id="Inputuser" name="user" value="{{ user.id }}"/>
             <button type="submit" class="btn btn-primary">Submit</button>
