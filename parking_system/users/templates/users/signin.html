@@ -33,6 +33,9 @@
                     <div class="mb-3">
                         <p>Have no account? <a href="{% url 'users:signup' %}">Sign-up</a></p>
                     </div>
+                    <div class="small text-center">
+                        <a href="{% url "users:password_reset" %}" class="text-center"><i>Forgot Password?</i></a>
+                    </div>
                 </form>
             </div>
         </main>

@@ -23,7 +23,7 @@ class CarsView(TemplateView):
     def get_context_data(self, **kwargs) -> dict[str]:
         context = super().get_context_data(**kwargs)
         if self.request.user.is_superuser:
-            cars = Car.objects.all()
+            cars = Car.objects.all().order_by('confirmed')
         else:
             cars = Car.objects.filter(user=self.request.user)
         for car in cars:
@@ -38,6 +38,11 @@ class CarCreateView(CreateView):
     model = Car
     fields = ['reg_mark', 'model', 'color', 'fare', 'user']
     success_url = reverse_lazy("parking:cars")
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['parking_info'] = ParkingInfo.objects.first()
+        return context
 
 
 @login_required
@@ -95,7 +100,7 @@ def parking(request):
         message = "Your car number was not detected or not register. Plase contact the administrator!"
         reg_mark = None
         for file_name in request.FILES:
-            car = Car.objects.filter(user=request.user).first()
+            car = Car.objects.filter(user=request.user, confirmed=True).first()
             if car is not None:
                 reg_mark = car.reg_mark
             break
