@@ -18,4 +18,6 @@ urlpatterns = [
     path('unban/<int:car_id>/', views.unban_car, name='unban_car'),
     path('search/', views.search_cars, name='search_cars'),
     path('ban_list/', views.CarsBanList.as_view(), name='ban_list'),
+    path('debtor_report/', views.DebtorListView.as_view(), name='debtor_report'),
+    #path('debtor_report/download', views.DebtorListView.as_view(), name='download_debtors'),
 ]

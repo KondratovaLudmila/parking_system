@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 from django.http import JsonResponse
@@ -32,7 +32,7 @@ class CarsView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         if self.request.user.is_superuser:
-            cars = Car.objects.all().order_by('confirmed')
+            cars = Car.objects.filter(is_banned=False).order_by('confirmed')
         else:
             cars = Car.objects.filter(user=self.request.user)
 
@@ -61,6 +61,34 @@ class CarsBanList(ListView):
 
     def get_queryset(self):
         return Car.objects.filter(is_banned=True)
+
+
+@method_decorator(login_required, name='dispatch')
+class DebtorListView(ListView):
+    model = Payment
+    template_name = 'parking/debtor_list.html'
+    context_object_name = 'debtors'
+
+    def get_queryset(self):
+        return self.model.objects.filter(amount__lt=0)
+    
+
+# class DownloadCSVView(View):
+#     model = Payment
+#     fields = ['']
+
+#     def get(self, request, *args, **kwargs):
+#         debtors = 
+#         response = HttpResponse(content_type='text/csv')
+#         response['Content-Disposition'] = 'attachment; filename="debtor_report.csv"'
+
+#         if blob_content:
+#             response = HttpResponse(blob_content.readall(), content_type=file_type)
+#             response['Content-Disposition'] = f'attachment; filename={filename}'
+#             messages.success(request, f"{filename} was successfully downloaded")
+#             return response
+
+#         return Http404
 
 
 @login_required
