@@ -140,8 +140,6 @@ class CarPlateReader:
         
         return text
 
-from imageprocessing import normalize_img
-
 
 # Функція для виявлення та вирізання номерних знаків з зображення
 def detect_and_crop_license_plates(image_path, output_dir, model_path=CURR_DIR.joinpath('runs','detect', 'train', 'weights','best.pt')):
