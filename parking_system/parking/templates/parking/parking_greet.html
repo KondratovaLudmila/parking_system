@@ -1,0 +1,45 @@
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="d-flex justify-content-center">
+        <div class="col-12">
+            <div class="container text-center">
+                {% if object.out_time %}
+                <h1 class="display-6 fw-normal text-body-emphasis">Goodbye, {{ user.username }}. Have a nice day!</h1>
+                <div class="row justify-content-center">
+                    <div class="col-4">
+                        <table class="table table-hover">
+                            <tr>
+                                <td>Car number</td>
+                                <td>{{ object.car.reg_mark }}</td>
+                            </tr>
+                            <tr>
+                                <td>Current fare</td>
+                                <td>{{ object.car.fare }} points per hour</td>
+                            </tr>
+                            <tr>
+                                <td>Parking duration</td>
+                                <td>{{ duration }} hours</td>
+                            </tr>
+                            <tr>
+                                <td>Total cost</td>
+                                <td>{{ object.cost }} points</td>
+                            </tr>
+                            <tr>
+                                <td>Balance</td>
+                                <td>{{ balance }} points</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <h1 class="display-6 fw-normal text-body-emphasis">Wellcome back, {{ user.username }}!</h1>
+                <h4 class="fw-normal text-body-emphasis">We glad to see your car {{ object.car.reg_mark }} again!</h4>
+                <h4 class="fw-normal text-body-emphasis">Your parking start at {{ object.in_time }}</h4>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

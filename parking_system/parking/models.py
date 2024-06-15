@@ -39,6 +39,14 @@ class Park(models.Model):
     out_time = models.DateTimeField(null=True, blank=True)
     cost = models.FloatField(default=0)
 
+    def duration_to_str(self):
+        total_duration_str = ''
+        if self.out_time:
+            total_duration = (self.out_time - self.in_time).total_seconds()
+            hours, remainder = divmod(total_duration, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            total_duration_str = '{:02}:{:02}:{:02}'.format(int(hours), int(minutes), int(seconds))
+        return total_duration_str
 
     def calculate_cost(self):
         if self.out_time:

@@ -4,20 +4,24 @@ from django.db.models.query import QuerySet
 from django.shortcuts import redirect, render, get_object_or_404, redirect
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_protect
-from datetime import datetime, timezone
-from .models import Car, Park, ParkingInfo, Ban
-from .decorators import superuser_required
-import csv
-from .forms import CarForm
 from django.db.models import Q
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from datetime import datetime, timezone
+
+import csv
+
+from .models import Car, Park, ParkingInfo, Ban, Payment
+from .decorators import superuser_required
+from .forms import CarForm
+from numberplate_ukr.main import CarPlateReader
 
 
 @method_decorator(login_required, name='dispatch')
@@ -83,13 +87,15 @@ class HistoryView(TemplateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class ParkingInView(TemplateView):
-    template_name = "parking/parking_wellcome.html"
+class ParkingGreetView(DetailView):
+    template_name = "parking/parking_greet.html"
+    model = Park
 
-
-@method_decorator(login_required, name='dispatch')
-class ParkingOutView(TemplateView):
-    template_name = "parking/parking_goodbye.html"
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['duration'] = context['object'].duration_to_str()
+        context['balance'] = Payment.objects.filter(user = self.request.user).first().amount
+        return context
 
 
 @method_decorator(superuser_required, name='dispatch')
@@ -111,34 +117,36 @@ class SettingsView(UpdateView):
 @login_required
 def parking(request):
     if request.method == 'POST':
-        message = "Your car number was not detected or not register. Plase contact the administrator!"
-        reg_mark = None
+        car = None
+        text = []
+        message = f"Your car number {''.join(text)} was not detected or not register. Plase contact the administrator!"
         for file_name in request.FILES:
-            car = Car.objects.filter(user=request.user, confirmed=True).first()
-            if car is not None:
-                reg_mark = car.reg_mark
-            break
+            file = bytearray(request.FILES[file_name].read())
+            text = CarPlateReader().img_process(file)
+            car = Car.objects.filter(user=request.user, reg_mark__in=text).first()
 
-        success = reg_mark is not None
+            if car is not None:
+                break
         
-        if success:
-            car = Car.objects.filter(reg_mark=reg_mark, user=request.user).first()
-            success = car is not None
-        
-        if success:
+        if car is not None:
             park = Park.objects.filter(car=car, out_time=None).first()
 
             if park:
                 park.out_time = datetime.now(timezone.utc)
                 park.save()
-                return redirect(to='parking:parking_out')
+                
             else:
                 park = Park(car=car)
                 park.save()
-                return redirect(to='parking:parking_in')
+            
+            return redirect('parking:parking_greet', park.pk)
 
         else:
-            return render(request, 'parking/parking.html', {'message': message})
+            if text:
+                message = f"Your car number {''.join(text)} not register. Plase contact the administrator!"
+            else:
+                message = f"Your car number was not detected. Plase try again!" 
+            return render(request, 'parking/parking.html', {'message': message, 'rcgn': text})
         
 
     return render(request, 'parking/parking.html')
