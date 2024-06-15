@@ -556,7 +556,7 @@ def normalize_img(img: np.ndarray,
                   to_gray: bool = False,
                   with_aug: bool = False) -> np.ndarray:
     if with_aug:
-        from nomeroff_net.tools.augmentations import aug
+        from augmentations import aug
         imgs = aug([img])
         img = imgs[0]
     if to_gray and img.shape[-1] == 3:

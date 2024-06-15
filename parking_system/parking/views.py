@@ -2,6 +2,7 @@ from typing import Any
 from django.db.models.base import Model as Model
 from django.db.models.query import QuerySet
 from django.shortcuts import redirect, render, get_object_or_404, redirect
+from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
@@ -10,12 +11,15 @@ from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_protect
+from django.db.models import Q
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from datetime import datetime, timezone
-from .models import Car, Park, ParkingInfo, Ban, Payment
-from .decorators import superuser_required
 
 import csv
 
+from .models import Car, Park, ParkingInfo, Ban, Payment
+from .decorators import superuser_required
 from .forms import CarForm
 from numberplate_ukr.main import CarPlateReader
 
@@ -26,14 +30,14 @@ class CarsView(TemplateView):
 
     def get_context_data(self, **kwargs) -> dict[str]:
         context = super().get_context_data(**kwargs)
+
         if self.request.user.is_superuser:
             cars = Car.objects.all().order_by('confirmed')
         else:
             cars = Car.objects.filter(user=self.request.user)
-        for car in cars:
-            car.is_banned = Ban.objects.filter(car=car).exists()
 
         context['cars'] = cars
+
         return context
     
 
@@ -47,6 +51,16 @@ class CarCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['parking_info'] = ParkingInfo.objects.first()
         return context
+
+
+@method_decorator(login_required, name='dispatch')
+class CarsBanList(ListView):
+    model = Car
+    template_name = 'parking/ban_list.html'
+    context_object_name = 'banned_cars'
+
+    def get_queryset(self):
+        return Car.objects.filter(is_banned=True)
 
 
 @login_required
@@ -192,6 +206,7 @@ def delete_car(request, id):
     return HttpResponse(status=405)
 
 
+@csrf_protect
 def edit_car(request, id):
     item = get_object_or_404(Car, id=id)
     if request.method == 'POST':
@@ -200,6 +215,7 @@ def edit_car(request, id):
             form.save()
             return redirect('parking:cars')
     else:
+        print("NE OK")
         form = CarForm(instance=item)
     return render(request, 'parking/edit_car.html', {'form': form, 'car': item})
 
@@ -210,6 +226,8 @@ def ban_car(request, car_id):
     car = get_object_or_404(Car, id=car_id)
     if request.method == 'POST':
         Ban.objects.create(car=car)
+        car.is_banned = True
+        car.save()
         return redirect('parking:cars')
     return HttpResponse(status=405)
 
@@ -221,5 +239,25 @@ def unban_car(request, car_id):
     if request.method == 'POST':
         ban = get_object_or_404(Ban, car=car)
         ban.delete()
+        car.is_banned = False
+        car.save()
         return redirect('parking:cars')
     return HttpResponse(status=405)
+
+
+@login_required
+@csrf_protect
+def search_cars(request):
+    if request.method == 'POST':
+        query = request.POST.get('q', '')
+        if request.user.is_superuser:
+            user_cars = Car.objects.all()
+        else:
+            user_cars = Car.objects.filter(user=request.user)
+
+        if query:
+            user_cars = user_cars.filter(
+                color__icontains=query) | user_cars.filter(
+                model__icontains=query) | user_cars.filter(
+                reg_mark__icontains=query)
+        return render(request, 'parking/car_list.html', {'cars': user_cars, "search_text": query})
