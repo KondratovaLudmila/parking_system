@@ -6,6 +6,7 @@ from .imageprocessing import normalize_img
 import easyocr
 import pathlib
 import re
+import numpy as np
 
 CURR_DIR = pathlib.Path(__file__).parent.resolve()
 
