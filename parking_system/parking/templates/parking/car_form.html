@@ -29,9 +29,9 @@
             <div class="mb-3">
                 <label for="inputUser" class="form-label">Owner</label>
                 <select id="inputUser" name="user" class="form-select {% if form.user.errors %}is-invalid{% endif %}" required>
-                    <option value="">Select owner</option>
+                    <option>Select owner</option>
                     {% for user in form.user.field.queryset %}
-                        <option value="{{ user.id }}" {% if user.id == form.user.value %}selected{% endif %}>{{ user.username }}</option>
+                        <option value="{{ user.id }}" {% if user.id == form.user.value %}selected="selected"{% endif %}>{{ user.username }}</option>
                     {% endfor %}
                 </select>
                 {% if form.user.errors %}
@@ -42,8 +42,8 @@
             </div>
             {% else %}
             <input type="hidden" class="form-control mb-3" id="InputFare" name="fare" value="{{ parking_info.default_fare }}"/>
-            {% endif %}
             <input type="hidden"  id="Inputuser" name="user" value="{{ user.id }}"/>
+            {% endif %}
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>

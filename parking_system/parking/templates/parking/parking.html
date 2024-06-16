@@ -7,14 +7,17 @@
         <div class="mb-3">
             <h2 class="display-6 fw-normal text-body-emphasis">Parking</h2>
         </div>
-        {% if message %}
+        {% if car.is_banned %}
+        <div>
+            <div class="alert alert-danger" role="alert">Car number {{ car.reg_mark }} is banned. Please contact the administrator</div>
+        </div>
+        {% elif car.confirmed == False %}
+        <div>
+            <div class="alert alert-danger" role="alert">Car number {{ car.reg_mark }} is waiting for confirmation. Please contact the administrator</div>
+        </div>
+        {% elif message %}
         <div>
             <div class="alert alert-danger" role="alert">{{ message }}</div>
-        </div>
-        {% endif %}
-        {% if text %}
-        <div>
-            <div class="alert alert-danger" role="alert">{{ text }}</div>
         </div>
         {% endif %}
         <form method="POST" enctype="multipart/form-data">
