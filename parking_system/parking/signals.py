@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 
-from parking.models import Payment, Park
+from parking.models import Park
 from utils.mailing import debtor_notification
 
 
@@ -22,12 +22,12 @@ def debiting(sender, instance, created, **kwargs):
     :doc-author: Trelent
     """
     if not created:
-        payment = Payment.objects.filter(user=instance.car.user).first()
-        if not payment:
+        profile = instance.car.user.profile
+        if not profile:
             return
         
-        payment.amount -= instance.cost
-        payment.save()
+        profile.balance -= instance.cost
+        profile.save()
 
-        if payment.amount < 0:
-            debtor_notification(payment.user, payment.amount)
+        if profile.balance < 0:
+            debtor_notification(profile.user, profile.balance)

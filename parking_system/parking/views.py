@@ -18,7 +18,8 @@ from datetime import datetime, timezone
 
 import csv
 
-from .models import Car, Park, ParkingInfo, Ban, Payment
+from users.models import Profile
+from .models import Car, Park, ParkingInfo, Ban
 from .decorators import superuser_required
 from .forms import CarForm
 from numberplate_ukr.main import CarPlateReader
@@ -44,14 +45,14 @@ class CarsView(TemplateView):
 @method_decorator(login_required, name='dispatch')
 class CarCreateView(CreateView):
     model = Car
-    fields = ['reg_mark', 'model', 'color', 'fare', 'user']
+    fields = ['reg_mark', 'model', 'color', 'fare', 'user', 'confirmed']
     success_url = reverse_lazy("parking:cars")
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['parking_info'] = ParkingInfo.objects.first()
         return context
-
+    
 
 @method_decorator(login_required, name='dispatch')
 class CarsBanList(ListView):
@@ -65,12 +66,12 @@ class CarsBanList(ListView):
 
 @method_decorator(login_required, name='dispatch')
 class DebtorListView(ListView):
-    model = Payment
+    model = Profile
     template_name = 'parking/debtor_list.html'
     context_object_name = 'debtors'
 
     def get_queryset(self):
-        return self.model.objects.filter(amount__lt=0)
+        return self.model.objects.filter(balance__lt=0)
     
 
 # class DownloadCSVView(View):
@@ -122,7 +123,8 @@ class ParkingGreetView(DetailView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['duration'] = context['object'].duration_to_str()
-        context['balance'] = Payment.objects.filter(user = self.request.user).first().amount
+        context['payment'] = self.request.user.profile
+        
         return context
 
 
@@ -156,7 +158,7 @@ def parking(request):
             if car is not None:
                 break
         
-        if car is not None:
+        if car is not None and car.confirmed and not car.is_banned:
             park = Park.objects.filter(car=car, out_time=None).first()
 
             if park:
@@ -174,7 +176,7 @@ def parking(request):
                 message = f"Your car number {''.join(text)} not register. Plase contact the administrator!"
             else:
                 message = f"Your car number was not detected. Plase try again!" 
-            return render(request, 'parking/parking.html', {'message': message, 'rcgn': text})
+            return render(request, 'parking/parking.html', {'message': message, 'car': car})
         
 
     return render(request, 'parking/parking.html')
