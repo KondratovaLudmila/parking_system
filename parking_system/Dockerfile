@@ -1,14 +1,6 @@
 # Use the official Python image as the base image
 FROM python:3.9-slim
 
-# Install necessary dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    libssl-dev \
-    libffi-dev \
-    netcat-openbsd
-
 # Set the working directory in the container
 WORKDIR /app
 
