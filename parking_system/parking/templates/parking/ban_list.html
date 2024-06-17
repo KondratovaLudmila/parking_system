@@ -7,8 +7,12 @@
             <div class="container text-center">
                 <h2 class="display-6 fw-normal text-body-emphasis mb-3">Banned cars</h2>
             </div>
-
-            <div class="table-responsive">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <form id="search-form" class="form-inline">
+                    <input id="search-input" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="q" required>
+                </form>
+            </div>
+            <div id="car-list" class="table-responsive">
                 <table class="table table-hover">
                 <thead>
                     <tr>
@@ -18,10 +22,9 @@
                     <th class="col-3" scope="col">Color</th>
                     <th class="col-2" scope="col">Owner</th>
                     <th class="col-2" scope="col">Reason</th>
-                    <th class="col-2" scope="col"></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="car-table-body">
                     {% for car in banned_cars %}
                     <tr>
                     <td>{{ car.id }}</td>
@@ -29,6 +32,11 @@
                     <td>{{ car.model }}</td>
                     <td>{{ car.color }}</td>
                     <td>{{ car.user }}</td>
+                    <td>
+                        {% for ban in car.ban_set.all %}
+                            {{ ban.reason }}
+                        {% endfor %}
+                    </td>
                     <td></td>
                     {% if user.is_superuser %}
                     <td>
@@ -75,5 +83,34 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput = document.getElementById('search-input');
+
+            searchInput.addEventListener('input', function() {
+                var query = this.value.trim();
+                if (query.length >= 1 || query.length === 0) {
+                    searchCars(query);
+                }
+            });
+
+            function searchCars(query) {
+                var url = "{% url 'parking:search_banned_cars' %}?q=" + encodeURIComponent(query);
+
+                fetch(url)
+                    .then(response => response.text())
+                    .then(data => {
+                        var tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = data;
+
+                        var tableBody = tempDiv.querySelector('#car-table-body');
+                        document.getElementById('car-table-body').innerHTML = tableBody.innerHTML;
+                    })
+                    .catch(error => {
+                        console.error('Ошибка:', error);
+                    });
+            }
+        });
+    </script>
 </div>
 {% endblock %}
