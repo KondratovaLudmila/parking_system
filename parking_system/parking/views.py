@@ -18,9 +18,11 @@ from datetime import datetime, timezone
 import csv
 
 from users.models import Profile
-from .models import Car, Park, ParkingInfo, Ban
+
 from .decorators import superuser_required
 from .forms import CarForm
+from .models import Car, Park, ParkingInfo, Ban
+
 from numberplate_ukr.main import CarPlateReader
 
 
@@ -56,7 +58,7 @@ class CarsView(TemplateView):
 
         context['cars'] = cars
         return context
-    
+
 
 @method_decorator(login_required, name='dispatch')
 class CarCreateView(CreateView):
@@ -68,7 +70,7 @@ class CarCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         context['parking_info'] = ParkingInfo.objects.first()
         return context
-    
+
 
 @method_decorator(login_required, name='dispatch')
 class CarsBanList(ListView):
@@ -112,7 +114,7 @@ class DebtorListView(ListView):
 
     def get_queryset(self):
         return self.model.objects.filter(balance__lt=0)
-    
+
 
 # class DownloadCSVView(View):
 #     model = Payment
@@ -139,19 +141,20 @@ def parking_report(request):
     else:
         cars = Car.objects.filter(user=request.user)
 
-        
+
 @method_decorator(login_required, name='dispatch')
 class HistoryView(TemplateView):
     template_name = "parking/history.html"
 
     def get_context_data(self, **kwargs) -> dict[str]:
         context = super().get_context_data(**kwargs)
-        
-        context['history'] = Park.objects.filter(car__user=self.request.user).order_by('-in_time').values('car__reg_mark', 
-                                                                                                          'in_time', 
-                                                                                                          'out_time', 
-                                                                                                          'cost',
-                                                                                                          'out_time')
+
+        context['history'] = Park.objects.filter(car__user=self.request.user).order_by('-in_time').values(
+            'car__reg_mark',
+            'in_time',
+            'out_time',
+            'cost',
+            'out_time')
         return context
 
 
@@ -164,7 +167,7 @@ class ParkingGreetView(DetailView):
         context = super().get_context_data(**kwargs)
         context['duration'] = context['object'].duration_to_str()
         context['payment'] = self.request.user.profile
-        
+
         return context
 
 
@@ -197,27 +200,26 @@ def parking(request):
 
             if car is not None:
                 break
-        
+
         if car is not None and car.confirmed and not car.is_banned:
             park = Park.objects.filter(car=car, out_time=None).first()
 
             if park:
                 park.out_time = datetime.now(timezone.utc)
                 park.save()
-                
+
             else:
                 park = Park(car=car)
                 park.save()
-            
+
             return redirect('parking:parking_greet', park.pk)
 
         else:
             if text:
                 message = f"Your car number {''.join(text)} not register. Plase contact the administrator!"
             else:
-                message = f"Your car number was not detected. Plase try again!" 
+                message = f"Your car number was not detected. Plase try again!"
             return render(request, 'parking/parking.html', {'message': message, 'car': car})
-        
 
     return render(request, 'parking/parking.html')
 
@@ -255,7 +257,7 @@ def download_reports(request):
     cars = Car.objects.all()
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="all_parking_reports.csv"'
-    
+
     writer = csv.writer(response)
     writer.writerow(['Registration Mark', 'Total Duration (seconds)', 'Total Cost', 'User'])
 
