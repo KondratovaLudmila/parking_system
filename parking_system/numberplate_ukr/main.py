@@ -2,7 +2,6 @@ import os
 from abc import ABC, abstractmethod
 import cv2
 from ultralytics import YOLO
-from .imageprocessing import normalize_img
 import easyocr
 import pathlib
 import re
@@ -29,7 +28,7 @@ class Ocr(ABC):
         return equalized
     
 
-    def postprocess(text: str | list) -> list:
+    def postprocess(text) -> list:
         return text
     
 
@@ -78,18 +77,19 @@ class OcrEasy(Ocr):
         return result
 
 class CarPlateReader:
-    model_path=CURR_DIR.joinpath('runs','detect', 'train', 'weights','best.pt')
+    model_path = CURR_DIR.joinpath('runs','detect', 'train', 'weights','best.pt')
     allowed_chars = {'ua': 'ABCEHIKMOPTX0123456789'}
-    detector = YOLO(model_path)
     image=None
+    detector = YOLO(model_path)
 
 
     def __init__(self, recognizer: Ocr=OcrEasy() , output_dir=None, from_buffer=True) -> None:
         self.output_dir = output_dir
         self.from_buffer = from_buffer
         self.recognizer = recognizer
+    
 
-    def img_read(self, image_file: str | bytearray):
+    def img_read(self, image_file):
         if self.from_buffer:
             image = self.read_from_buffer(image_file)
         else:
@@ -135,7 +135,7 @@ class CarPlateReader:
         text = []
         for plate in plates:
             #plate = self.recognizer.preprocess(plate)
-            #cv2.imwrite('plate.jpg', plate)
+            cv2.imwrite('plate.jpg', plate)
             result = self.recognizer.read_text(plate, allowed_chars=self.allowed_chars['ua'])
             text.extend(self.recognizer.postprocess(result))
         
@@ -162,7 +162,7 @@ def detect_and_crop_license_plates(image_path, output_dir, model_path=CURR_DIR.j
     for idx, license_plate in enumerate(license_plates.boxes.data.tolist()):
         x1, y1, x2, y2, score, class_id = license_plate
         # Вирізати номерний знак
-        license_plate_crop = normalize_img(image[int(y1):int(y2), int(x1): int(x2), :])
+        license_plate_crop = image[int(y1):int(y2), int(x1): int(x2), :]
         output_path = os.path.join(output_dir, f"license_plate_{idx}.png")
         cv2.imwrite(output_path, license_plate_crop)
         break
