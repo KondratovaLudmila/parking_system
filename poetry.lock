@@ -1218,6 +1218,32 @@ files = [
 diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
+name = "pytelegrambotapi"
+version = "4.19.2"
+description = "Python Telegram bot api."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytelegrambotapi-4.19.2-py3-none-any.whl", hash = "sha256:c2c87807523dc3eb3a3f73f2c9a037e34612e89019d0ce04ae81351c740757ff"},
+    {file = "pytelegrambotapi-4.19.2.tar.gz", hash = "sha256:39481e607c76b217606052f3e542322a53eada212914090a46d565a47729711d"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[package.extras]
+aiohttp = ["aiohttp"]
+aioredis = ["aioredis"]
+coloredlogs = ["coloredlogs"]
+fastapi = ["fastapi"]
+json = ["ujson"]
+pil = ["pillow"]
+psutil = ["psutil"]
+redis = ["redis (>=3.4.1)"]
+uvicorn = ["uvicorn"]
+watchdog = ["watchdog"]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 description = "Extensions to the standard Python datetime module"
@@ -1554,6 +1580,21 @@ files = [
 ]
 
 [[package]]
+name = "telebot"
+version = "0.0.5"
+description = "A Telegram bot library, with simple route decorators."
+optional = false
+python-versions = "*"
+files = [
+    {file = "telebot-0.0.5-py3-none-any.whl", hash = "sha256:50327c240243480d40ade4ea5bea4f464bf57d4ff000ea669fcd705396074863"},
+    {file = "telebot-0.0.5.tar.gz", hash = "sha256:848a5885b57247b65edd0e92647b4372ebd8d41611dca3f344788c11deac2571"},
+]
+
+[package.dependencies]
+pyTelegramBotAPI = "*"
+requests = "*"
+
+[[package]]
 name = "tifffile"
 version = "2024.5.22"
 description = "Read and write TIFF files"
@@ -1795,4 +1836,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "caa63328525a8d99d49e4e1d1295dd9b1a466a089f31ecd9b2bfed273e249a9c"
+content-hash = "77d35ecc7fcaea15afd3632c31ca535365d3c4cc691f9482b13093cf00f37e09"
