@@ -10,6 +10,7 @@ This project is a Django-based web application designed to manage a parking syst
 
 - User Authentication
 - Parking Space Management
+- LiqPay acquiring for easy payment
 - License Plate Recognition using EasyOCR and OpenCV
 - Secure HTTPS connections with Let's Encrypt
 - Deployment with Docker and Docker Compose
@@ -99,6 +100,11 @@ DEBUG = True
 SUPERUSER_USERNAME=admin
 SUPERUSER_EMAIL=admin@example.com
 SUPERUSER_PASSWORD=password
+
+LIQPAY_PUBLIC_KEY=your liqpay public key
+LIQPAY_PRIVATE_KEY=your liqpay private key
+DEBUG_HOST=your debuging host
+
 ```
 
 ## Build and Run the Project
