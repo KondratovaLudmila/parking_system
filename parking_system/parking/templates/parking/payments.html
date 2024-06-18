@@ -1,0 +1,44 @@
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="d-flex justify-content-center">
+        <div class="col-6">
+            <div class="container text-center mb-3">
+                <h2 class="display-6 fw-normal text-body-emphasis mb-3 dropdown">Payments</h2>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                <h3 class="fw-normal text-body-emphasis">Balance <span {% if user.profile.balance < 0 %} class="text-danger" {% endif %}>{{ user.profile.balance }} UAH</span></h3>
+                <a href="#" role="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Refill balance
+                </a>
+                <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'parking:pay' amount=100 %}">by 100 UAH</a></li>
+                <li><a class="dropdown-item" href="{% url 'parking:pay' amount=200 %}">by 200 UAH</a></li>
+                <li><a class="dropdown-item" href="{% url 'parking:pay' amount=500 %}">by 500 UAH</a></li>
+                </ul>
+                </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                <thead>
+                    <tr>
+                    <th class="col-1" scope="col">#</th>
+                    <th class="col-3" scope="col">Date</th>
+                    <th class="col-2" scope="col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments %}
+                    <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ p.created }}</td>
+                    <td {% if p.amount < 0 %} class="text-danger"{% else %} class="text-success" {% endif %}>{{ p.amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -125,6 +125,8 @@
                     <li class="nav-item"><a href="{% url 'users:profile' %}" {% if request.resolver_match.url_name == "profile" %} class="nav-link active" {% else %} class="nav-link" {% endif %} aria-current="page">Profile</a></li>
                     {% if user.is_superuser %}
                     <li class="nav-item"><a href="{% url 'parking:ban_list' %}" {% if request.resolver_match.url_name == "ban_list" %} class="nav-link active" {% else %} class="nav-link" {% endif %}>Ban List</a></li>
+                    {% else %}
+                    <li class="nav-item"><a href="{% url 'parking:payment' %}" {% if request.resolver_match.url_name == "ban_list" %} class="nav-link active" {% else %} class="nav-link" {% endif %}>Payments {% if user.profile.balance < 0 %}<span class="badge rounded-pill text-bg-danger">!</span>{% endif %}</a></li>
                     {% endif %}
                 </ul>
                 <div class="col-md-3 text-end">

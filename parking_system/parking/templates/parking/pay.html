@@ -1,0 +1,26 @@
+{% extends "parking/base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-center">
+    <div id="liqpay_checkout"></div>
+    <script>
+        window.LiqPayCheckoutCallback = function() {
+            LiqPayCheckout.init({
+                data: "{{ data }}",
+                signature: "{{ signature }}",
+                embedTo: "#liqpay_checkout",
+                mode: "embed" // embed || popup,
+            }).on("liqpay.callback", function(data){
+                setTimeout(function() {
+                window.location.href = "{% url 'parking:payment' %}"; // Replace with your target URL
+            }, 5000); // 5000 milliseconds = 5 seconds
+            }).on("liqpay.ready", function(data){
+                // ready
+            }).on("liqpay.close", function(data){
+                // close
+            });
+        };
+    </script>
+    <script src="//static.liqpay.ua/libjs/checkout.js" async></script>
+</div>
+{% endblock %}
