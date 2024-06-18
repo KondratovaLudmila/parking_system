@@ -341,6 +341,11 @@ class PayView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         payment = Payment.objects.create(user=request.user)
+        if settings.DEBUG:
+            callback_url = settings.DEBUG_HOST + '/payment/pay_callback/'
+        else:
+            callback_url = request.build_absolute_uri('/payment/pay_callback/')
+
         liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
         params = {
             'action': 'pay',
@@ -350,7 +355,7 @@ class PayView(TemplateView):
             'order_id': f'order_id_{payment.pk}',
             'version': '3',
             'sandbox': 0, # sandbox mode, set to 1 to enable it
-            'server_url': 'https://c90js7vw-8000.use.devtunnels.ms/payment/pay_callback/', # url to callback view
+            'server_url': callback_url, # url to callback view
         }
         signature = liqpay.cnb_signature(params)
         data = liqpay.cnb_data(params)
