@@ -10,7 +10,7 @@ WORK_DIR = Path(__file__).parent.parent.resolve()
 USERS_JSON = WORK_DIR.joinpath('bot_files', 'users.json')
 
 if not USERS_JSON.exists():
-    USERS_JSON.parent.mkdir(parents=True)
+    USERS_JSON.parent.mkdir(parents=True, exist_ok=True)
     try:
         with open(USERS_JSON, 'w') as f:
             m = {}

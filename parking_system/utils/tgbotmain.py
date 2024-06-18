@@ -20,7 +20,7 @@ email_regex = re.compile(email_pattern)
 
 if not USERS_JSON.exists():
     try:
-        USERS_JSON.parent.mkdir(parents=True)
+        USERS_JSON.parent.mkdir(parents=True, exist_ok=True)
         with open(USERS_JSON, 'w') as f:
             m = {}
             json.dump(m, f)
