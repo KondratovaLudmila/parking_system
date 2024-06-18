@@ -4,6 +4,7 @@ from django.dispatch import receiver
 
 from parking.models import Park, Payment
 from utils.mailing import debtor_notification
+from utils.parkingsend import tg_notify
 
 
 @receiver(post_save, sender=Park)
@@ -24,7 +25,8 @@ def debiting(sender, instance, created, **kwargs):
     if not created:
         payment = Payment(amount=-instance.cost, user=instance.car.user)
         payment.save()
-
+    #Notify user in telegram
+    tg_notify(instance.car.user.email)
 
 
 @receiver(post_save, sender=Payment)
