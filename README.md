@@ -106,7 +106,7 @@ SUPERUSER_PASSWORD=password
 Build and run the Docker containers:
 
 ```sh
-docker-compose up --build
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
 ## Apply Migrations
@@ -115,7 +115,7 @@ The migrations are applied automatically each time the containers are started. W
 
 Here is how it works:
 
-- When you run `docker-compose up --build`, the `web` service will execute the `python manage.py migrate` command automatically.
+- When you run `docker-compose -f docker-compose.dev.yml up --build`, the `web` service will execute the `python manage.py migrate` command automatically.
 - This ensures that all database migrations are applied without manual intervention.
 
 This setup helps streamline the deployment process and ensures the application is always running with the latest database schema.
