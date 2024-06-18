@@ -357,7 +357,6 @@ class PayView(TemplateView):
             'sandbox': 0, # sandbox mode, set to 1 to enable it
             'server_url': callback_url, # url to callback view
         }
-        print(callback_url)
         signature = liqpay.cnb_signature(params)
         data = liqpay.cnb_data(params)
         return render(request, self.template_name, {'signature': signature, 'data': data})
