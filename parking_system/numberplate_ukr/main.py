@@ -135,7 +135,7 @@ class CarPlateReader:
         text = []
         for plate in plates:
             #plate = self.recognizer.preprocess(plate)
-            cv2.imwrite('plate.jpg', plate)
+            #cv2.imwrite('plate.jpg', plate)
             result = self.recognizer.read_text(plate, allowed_chars=self.allowed_chars['ua'])
             text.extend(self.recognizer.postprocess(result))
         

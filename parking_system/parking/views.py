@@ -1,27 +1,28 @@
+import csv
+from django.conf import settings
+from liqpay import LiqPay
 from typing import Any
+from random import randint
 
 from django.db.models import Q
 from django.db.models.base import Model as Model
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
-from django.views.generic.base import TemplateView
+from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.urls import reverse_lazy
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_protect
+from django.http import HttpResponse, Http404
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
 from datetime import datetime, timezone
 
-import csv
-
 from users.models import Profile
-
 from .decorators import superuser_required
 from .forms import CarForm
-from .models import Car, Park, ParkingInfo, Ban
+from .models import Car, Park, ParkingInfo, Ban, Payment
 
 from numberplate_ukr.main import CarPlateReader
 
@@ -189,10 +190,15 @@ class SettingsView(UpdateView):
 
 @login_required
 def parking(request):
+    if request.method == 'GET':
+        message = ''
+        if request.user.profile.balance < 0:
+            message = "You cann't park your car due to parking debt! Please, repay the debt."
+
     if request.method == 'POST':
         car = None
         text = []
-        message = f"Your car number {''.join(text)} was not detected or not register. Plase contact the administrator!"
+        message = f"Your car number was not detected or not register. Please contact the administrator!"
         for file_name in request.FILES:
             file = bytearray(request.FILES[file_name].read())
             text = CarPlateReader().img_process(file)
@@ -201,7 +207,11 @@ def parking(request):
             if car is not None:
                 break
 
-        if car is not None and car.confirmed and not car.is_banned:
+        if car is not None and \
+            car.confirmed and \
+            not car.is_banned and \
+            request.user.profile.balance >= 0:
+
             park = Park.objects.filter(car=car, out_time=None).first()
 
             if park:
@@ -221,7 +231,7 @@ def parking(request):
                 message = f"Your car number was not detected. Plase try again!"
             return render(request, 'parking/parking.html', {'message': message, 'car': car})
 
-    return render(request, 'parking/parking.html')
+    return render(request, 'parking/parking.html', {'message': message})
 
 
 @login_required
@@ -315,3 +325,64 @@ def unban_car(request, car_id):
         car.save()
         return redirect('parking:ban_list')
     return HttpResponse(status=405)
+
+
+class PaymentListView(ListView):
+    model =  Payment
+    template_name = 'parking/payments.html'
+    context_object_name = 'payments'
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user).filter(Q(amount__lt=0) | Q(amount__gt=0)).order_by('-created')
+
+
+class PayView(TemplateView):
+    template_name = 'parking/pay.html'
+
+    def get(self, request, *args, **kwargs):
+        payment = Payment.objects.create(user=request.user)
+        liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
+        params = {
+            'action': 'pay',
+            'amount': f'{self.kwargs["amount"]}',
+            'currency': 'UAH',
+            'description': 'Payment for parking',
+            'order_id': f'order_id_{payment.pk}',
+            'version': '3',
+            'sandbox': 0, # sandbox mode, set to 1 to enable it
+            'server_url': 'https://c90js7vw-8000.use.devtunnels.ms/payment/pay_callback/', # url to callback view
+        }
+        signature = liqpay.cnb_signature(params)
+        data = liqpay.cnb_data(params)
+        return render(request, self.template_name, {'signature': signature, 'data': data})
+    
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PayCallbackView(View):
+    
+    def post(self, request, *args, **kwargs):
+        liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
+        data = request.POST.get('data')
+        signature = request.POST.get('signature')
+        sign = liqpay.str_to_sign(settings.LIQPAY_PRIVATE_KEY + data + settings.LIQPAY_PRIVATE_KEY)
+        if sign == signature:
+            print('callback is valid')
+        else:
+            return Http404()
+        
+        response = liqpay.decode_data_from_str(data)
+
+        try:
+            payment_id = int(response['order_id'].replace('order_id_', ''))
+            
+            payment = Payment.objects.get(pk=payment_id)
+            if response['status'] == 'success':
+                payment.amount = float(response['amount'])
+                payment.save()
+            else:
+                payment.delete()
+
+        except Exception as err:
+            print(err)
+        
+        return HttpResponse()

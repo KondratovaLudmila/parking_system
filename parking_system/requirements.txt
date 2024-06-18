@@ -6,3 +6,4 @@ ultralytics==8.2.32
 matplotlib==3.5.1
 python-dotenv==0.19.2
 easyocr
+liqpay-sdk-python3
