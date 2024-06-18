@@ -32,14 +32,6 @@ def check_user(chat_id):
     return False
 
 
-def send_mails(dict_mail):
-    with open(user_file, 'r') as f:
-        m = json.load(f)
-    for chat_id, email in m.items():
-        if dict_mail == email:
-            bot.send_message(chat_id, 'Ворота відкриваються.')
-
-
 @bot.message_handler(commands=['start'])
 def start(message):
     markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
