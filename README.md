@@ -105,6 +105,7 @@ LIQPAY_PUBLIC_KEY=your liqpay public key
 LIQPAY_PRIVATE_KEY=your liqpay private key
 DEBUG_HOST=your debuging host
 
+TG_BOT_TOKEN=your telegmam bot token
 ```
 
 ## Build and Run the Project
