@@ -15,7 +15,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     command: >
       sh -c "
       python manage.py migrate &&
@@ -46,6 +46,20 @@ services:
       - media_volume:/app/media
       - /etc/letsencrypt/live:/etc/letsencrypt/live:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
+    depends_on:
+      - web
+    networks:
+      - mynetwork
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python utils/tgbotmain.py
+    volumes:
+      - .:/app
+    env_file:
+      - .env
     depends_on:
       - web
     networks:
