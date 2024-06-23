@@ -15,7 +15,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     command: >
       sh -c "
       python manage.py migrate &&
@@ -45,6 +45,21 @@ services:
       - media_volume:/app/media
     depends_on:
       - web
+    networks:
+      - mynetwork
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+      python utils/tgbotmain.py
+      "
+    volumes:
+      - .:/app
+    env_file:
+      - .env
     networks:
       - mynetwork
 

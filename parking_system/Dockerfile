@@ -8,25 +8,23 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copy the requirements file into the container
 COPY requirements.txt .
 
 # Upgrade pip and install the Python dependencies
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire project into the container
 COPY . .
 
 # Ensure the static and media directories exist
-RUN mkdir -p /app/static
-RUN mkdir -p /app/staticfiles
-RUN mkdir -p /app/media
+RUN mkdir -p /app/static /app/staticfiles /app/media
 
 # Copy the entrypoint script into the container and make it executable
-COPY ./entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Expose the port that the app runs on
